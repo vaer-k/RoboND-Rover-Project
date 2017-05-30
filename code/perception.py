@@ -15,11 +15,15 @@ def color_thresh(img, rgb_thresh=(160, 160, 160)):
                 & (img[:,:,2] > rgb_thresh[2])
     # Index the array of zeros with the boolean array and set to 1
     color_select[above_thresh] = 1
+
+    half = color_select.shape[0] // 2
+    color_select[:half, :] = 0
+
     # Return the binary image
     return color_select
 
 
-def obstacle_thresh(img, rgb_thresh=(70, 70, 70)):
+def obstacle_thresh(img, rgb_thresh=(160, 160, 160)):
     # Create an array of zeros same xy size as img, but single channel
     color_select = np.zeros_like(img[:, :, 0])
     # Require that each pixel be above all three threshold values in RGB
@@ -33,6 +37,10 @@ def obstacle_thresh(img, rgb_thresh=(70, 70, 70)):
                    & (img[:, :, 2] > 0)
     # Index the array of zeros with the boolean array and set to 1
     color_select[below_thresh] = 1
+
+    half = color_select.shape[0] // 2
+    color_select[:half, :] = 0
+
     # Return the binary image
     return color_select
 
@@ -160,9 +168,9 @@ def perception_step(Rover):
     #          Rover.vision_image[:,:,1] = rock_sample color-thresholded binary image
     #          Rover.vision_image[:,:,2] = navigable terrain color-thresholded binary image
 
-    Rover.vision_image[:,:,0] = obstacles  # obstacle color-thresholded binary image
-    Rover.vision_image[:,:,1] = rocks  # rock_sample color-thresholded binary image
-    Rover.vision_image[:,:,2] = navigable  # navigable terrain color-thresholded binary image
+    Rover.vision_image[:,:,0] = obstacles * 255  # obstacle color-thresholded binary image
+    Rover.vision_image[:,:,1] = rocks * 255  # rock_sample color-thresholded binary image
+    Rover.vision_image[:,:,2] = navigable * 255  # navigable terrain color-thresholded binary image
 
     # 5) Convert map image pixel values to rover-centric coords
 
@@ -194,9 +202,9 @@ def perception_step(Rover):
         #          Rover.worldmap[rock_y_world, rock_x_world, 1] += 1
         #          Rover.worldmap[navigable_y_world, navigable_x_world, 2] += 1
 
-    Rover.worldmap[rock_y_world, rock_x_world] = (255, 255, 255)
-    Rover.worldmap[obstacle_y_world, obstacle_x_world] = (255, 0, 0)
-    Rover.worldmap[navigable_y_world, navigable_x_world] = (0, 0, 255)
+    Rover.worldmap[rock_y_world, rock_x_world, 1] = 255
+    Rover.worldmap[obstacle_y_world, obstacle_x_world, 0] = 255
+    Rover.worldmap[navigable_y_world, navigable_x_world, 2] = 255
 
     # 8) Convert rover-centric pixel positions to polar coordinates
     # Update Rover pixel distances and angles

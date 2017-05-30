@@ -25,6 +25,10 @@ def update_rover(Rover, data):
       Rover.vel = np.float(data["speed"])
       # The current position of the rover
       Rover.pos = np.fromstring(data["position"], dtype=float, sep=',')
+
+      if Rover.last_pos is None or Rover.total_time % 5 == 0:
+            Rover.last_pos = Rover.pos
+
       # The current yaw angle of the rover
       Rover.yaw = np.float(data["yaw"])
       # The current yaw angle of the rover
